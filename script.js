@@ -1,3 +1,26 @@
+const SUPABASE_URL = "https://axfcbxgcvqvxbjjyncja.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_xkuFml2vQI7PDhANvcVHDw_ZdjOcLTH";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+async function testSupabase() {
+    const { data, error } = await supabaseClient
+        .from("homework")
+        .select("*");
+
+    if (error) {
+        console.error("Supabase 连接失败：", error);
+        return;
+    }
+
+    console.log("Supabase 连接成功！");
+    console.log(data);
+}
+
+testSupabase();
 // ==============================
 // 1. 获取网页元素
 // ==============================
@@ -34,28 +57,23 @@ let currentFilter = "all";
 // ==============================
 // 3. 获取保存的数据
 // ==============================
-const savedHomework =
-    localStorage.getItem("homeworkData");
-let homeworkData = savedHomework
-    ? JSON.parse(savedHomework)
-    : [
-        {
-            subject: "高等数学",
-            content: "函数与极限 P12 1～5题",
-            deadline: "2026-09-12",
-            fileName: "",
-            fileURL: "",
-            completed: false
-        },
-        {
-            subject: "大学英语",
-            content: "Unit 2 Reading",
-            deadline: "2026-09-14",
-            fileName: "",
-            fileURL: "",
-            completed: false
-        }
-    ];
+let homeworkData = [];
+
+async function loadHomework() {
+    const { data, error } = await supabaseClient
+        .from("homework")
+        .select("*");
+
+    if (error) {
+        console.error("获取作业失败：", error);
+        return;
+    }
+
+    homeworkData = data;
+    renderHomework();
+}
+
+loadHomework();
 // ==============================
 // 4. 保存数据
 // ==============================
@@ -305,24 +323,22 @@ function renderHomework() {
 // ==============================
 submitButton.addEventListener(
     "click",
-    function() {
-        // ==========================
+    async function() {
+
         // 获取输入
-        // ==========================
         const subject =
             subjectInput.value.trim();
+
         const content =
             contentInput.value.trim();
+
         const deadline =
             deadlineInput.value;
-        // ==========================
+
         // 防止空提交
-        // ==========================
         if (
-            !subject
-            ||
-            !content
-            ||
+            !subject ||
+            !content ||
             !deadline
         ) {
             alert(
@@ -330,69 +346,82 @@ submitButton.addEventListener(
             );
             return;
         }
-        // ==========================
+
         // 判断是否为编辑
-        // ==========================
         const editIndex =
             submitButton.dataset.editIndex;
-        // ==========================
+
         // 编辑
-        // ==========================
         if (
             editIndex !== undefined
         ) {
+            // 这里暂时还是原来的代码
             homeworkData[
                 Number(editIndex)
             ].subject = subject;
+
             homeworkData[
                 Number(editIndex)
             ].content = content;
+
             homeworkData[
                 Number(editIndex)
             ].deadline = deadline;
+
             delete submitButton.dataset.editIndex;
+
             submitButton.textContent =
                 "添加";
         }
-        // ==========================
+
         // 添加
-        // ==========================
         else {
             const file =
                 fileInput.files[0];
+
             let fileName = "";
-            let fileURL = "";
+
             if (file) {
-                fileName =
-                    file.name;
-                fileURL =
-                    URL.createObjectURL(
-                        file
-                    );
+                fileName = file.name;
             }
-            const newHomework = {
-                subject: subject,
-                content: content,
-                deadline: deadline,
-                fileName: fileName,
-                fileURL: fileURL,
-                completed: false
-            };
-            homeworkData.push(
-                newHomework
+
+            const { data, error } =
+                await supabaseClient
+                    .from("homework")
+                    .insert([
+                        {
+                            subject: subject,
+                            content: content,
+                            deadline: deadline,
+                            file_name: fileName,
+                            completed: false
+                        }
+                    ])
+                    .select();
+
+            if (error) {
+                console.error(
+                    "添加作业失败：",
+                    error
+                );
+
+                alert(
+                    "添加作业失败，请查看控制台。"
+                );
+
+                return;
+            }
+
+            console.log(
+                "添加成功：",
+                data
             );
         }
-        // ==========================
-        // 保存
-        // ==========================
-        saveHomework();
-        // ==========================
+
         // 更新页面
-        // ==========================
-        renderHomework();
-        // ==========================
+        await loadHomework();
+
         // 清空表单
-        // ==========================
         subjectInput.value = "";
         contentInput.value = "";
         deadlineInput.value = "";
@@ -442,4 +471,3 @@ filterButtons.forEach(
 // ==============================
 // 10. 第一次打开页面
 // ==============================
-renderHomework();
