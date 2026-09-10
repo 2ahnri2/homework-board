@@ -1,0 +1,211 @@
+/* ==============================
+   所有元素统一计算方式
+============================== */
+* {
+    box-sizing: border-box;
+}
+/* ==============================
+   整个网页
+============================== */
+body {
+    margin: 0;
+    background: #f5f5f5;
+    font-family: Arial, sans-serif;
+    color: #222;
+}
+/* ==============================
+   页面主体
+============================== */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+/* ==============================
+   标题区域
+============================== */
+header {
+    margin-bottom: 30px;
+}
+h1 {
+    margin: 0 0 8px 0;
+    font-size: 30px;
+}
+header p {
+    margin: 0;
+    color: #777;
+}
+/* ==============================
+   作业列表
+============================== */
+.homework-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+/* ==============================
+   单个作业卡片
+============================== */
+.homework-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+/* 课程名称 */
+.subject {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+/* 作业内容 */
+.homework-card h2 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+}
+/* 作业详细内容 */
+.content {
+    margin: 0 0 15px 0;
+    line-height: 1.6;
+}
+/* 截止日期 */
+.deadline {
+    margin: 0;
+    font-size: 14px;
+    color: #777;
+}
+/* ==============================
+   附件
+============================== */
+.attachment {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 10px;
+    background: #f2f2f2;
+    border-radius: 8px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+}
+.attachment:hover {
+    background: #e8e8e8;
+}
+/* ==============================
+   添加按钮
+============================== */
+.add-button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: #222;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+/* ==============================
+   添加作业表单
+============================== */
+.form {
+    display: none;
+    margin-top: 15px;
+}
+/* 输入框 */
+.form input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+}
+/* 文件选择框 */
+.form input[type="file"] {
+    padding: 10px;
+}
+/* 添加按钮 */
+.form button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #555;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+/* ==============================
+   作业卡片按钮
+============================== */
+.card-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+/* 完成按钮 */
+.complete-button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #eeeeee;
+    color: #333;
+    cursor: pointer;
+}
+/* 删除按钮 */
+.delete-button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #eeeeee;
+    color: #777;
+    cursor: pointer;
+}
+/* 已完成的作业 */
+.completed {
+    text-decoration: line-through;
+    opacity: 0.45;
+}
+/* ==============================
+   搜索与筛选
+============================== */
+.tools {
+    margin-bottom: 20px;
+}
+/* 搜索框 */
+#searchInput {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    background: white;
+    outline: none;
+}
+/* 搜索框获得焦点 */
+#searchInput:focus {
+    border-color: #999;
+}
+/* 筛选按钮区域 */
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+/* 筛选按钮 */
+.filter-button {
+    flex: 1;
+    padding: 9px;
+    border: none;
+    border-radius: 8px;
+    background: #e9e9e9;
+    color: #555;
+    cursor: pointer;
+}
+/* 当前选择的筛选条件 */
+.filter-button.active {
+    background: #222;
+    color: white;
+}

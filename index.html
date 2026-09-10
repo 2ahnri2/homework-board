@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 让网页在手机上正常显示 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作业板</title>
+    <!-- 连接 CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <!-- =========================
+             页面标题
+        ========================== -->
+        <header>
+            <h1>作业板</h1>
+            <p>哦耶图省事</p >
+        </header>
+        <!-- =========================
+             作业列表
+        ========================== -->
+        
+<!-- =========================
+     搜索与筛选
+========================== -->
+<section class="tools">
+    <!-- 搜索框 -->
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="搜索课程或作业内容……"
+    >
+    <!-- 筛选按钮 -->
+    <div class="filter-buttons">
+        <button
+            class="filter-button active"
+            data-filter="all"
+        >
+            全部
+        </button>
+        <button
+            class="filter-button"
+            data-filter="unfinished"
+        >
+            未完成
+        </button>
+        <button
+            class="filter-button"
+            data-filter="completed"
+        >
+            已完成
+        </button>
+    </div>
+</section>
+<!-- =========================
+     作业列表
+========================== -->
+<section
+    class="homework-list"
+    id="homeworkList"
+>
+</section>
+        >
+        </section>
+        <!-- =========================
+             添加作业按钮
+        ========================== -->
+        <button
+            class="add-button"
+            id="addButton"
+        >
+            ＋ 添加作业
+        </button>
+        <!-- =========================
+             添加作业表单
+        ========================== -->
+        <div
+            class="form"
+            id="homeworkForm"
+        >
+            <!-- 课程 -->
+            <input
+                type="text"
+                id="subjectInput"
+                placeholder="课程，例如：高等数学"
+            >
+            <!-- 作业内容 -->
+            <input
+                type="text"
+                id="contentInput"
+                placeholder="作业内容，例如：P12 1～5题"
+            >
+            <!-- 截止日期 -->
+            <input
+                type="date"
+                id="deadlineInput"
+            >
+            <!-- 作业资料 -->
+            <input
+                type="file"
+                id="fileInput"
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.zip"
+            >
+            <!-- 添加 -->
+            <button
+                id="submitButton"
+            >
+                添加
+            </button>
+        </div>
+    </main>
+    <!-- 连接 JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
