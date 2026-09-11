@@ -180,20 +180,18 @@ function renderHomework() {
             // 附件
             // ======================
             let attachmentHTML = "";
+
             if (
-                homework.fileName
-                &&
-                homework.fileURL
+                homework.file_name &&
+                homework.file_url
             ) {
-                attachmentHTML = `
-                    <a
-                        class="attachment"
-                        href=" "
-                        target="_blank"
-                    >
-                        📎 ${homework.fileName}
-                    </a >
-                `;
+                attachmentHTML =
+                    '<a class="attachment" href="' +
+                    homework.file_url +
+                    '" target="_blank">' +
+                    '📎 ' +
+                    homework.file_name +
+                    '</a >';
             }
             // ======================
             // 作业卡片
@@ -212,19 +210,19 @@ function renderHomework() {
                 <div class="card-buttons">
                     <button
                         class="complete-button"
-                        data-index="${index}"
+                        data-id="${homework.id}"
                     >
                         ${completedText}
                     </button>
                     <button
                         class="edit-button"
-                        data-index="${index}"
+                        data-id="${homework.id}"
                     >
                         编辑
                     </button>
                     <button
                         class="delete-button"
-                        data-index="${index}"
+                        data-id="${homework.id}"
                     >
                         删除
                     </button>
@@ -233,26 +231,62 @@ function renderHomework() {
             homeworkList.appendChild(card);
         }
     );
-    // ==========================
-    // 完成按钮
-    // ==========================
+   // ==========================
+// 完成按钮
+// ==========================
     const completeButtons =
-        document.querySelectorAll(
-            ".complete-button"
-        );
+    document.querySelectorAll(
+        ".complete-button"
+    );
+
     completeButtons.forEach(
         function(button) {
             button.addEventListener(
                 "click",
-                function() {
-                    const index =
+                async function() {
+                    const id =
                         Number(
-                            button.dataset.index
+                            button.dataset.id
                         );
-                    homeworkData[index].completed =
-                        !homeworkData[index].completed;
-                    saveHomework();
-                    renderHomework();
+
+                    const homework =
+                        homeworkData.find(
+                            function(item) {
+                                return item.id === id;
+                            }
+                        );
+
+                    if (!homework) {
+                        return;
+                    }
+
+                    const newCompleted =
+                        !homework.completed;
+
+                    const { error } =
+                        await supabaseClient
+                            .from("homework")
+                            .update({
+                                completed:
+                                    newCompleted
+                            })
+                            .eq(
+                                "id",
+                                id
+                            );
+
+                    if (error) {
+                        console.error(
+                            "修改完成状态失败：",
+                            error
+                        );
+                        alert(
+                            "修改失败，请查看控制台。"
+                        );
+                        return;
+                    }
+
+                    await loadHomework();
                 }
             );
         }
@@ -264,29 +298,45 @@ function renderHomework() {
         document.querySelectorAll(
             ".edit-button"
         );
+
     editButtons.forEach(
         function(button) {
             button.addEventListener(
                 "click",
                 function() {
-                    const index =
+                    const id =
                         Number(
-                            button.dataset.index
+                            button.dataset.id
                         );
+
                     const homework =
-                        homeworkData[index];
+                        homeworkData.find(
+                            function(item) {
+                                return item.id === id;
+                            }
+                        );
+
+                    if (!homework) {
+                        return;
+                    }
+
                     subjectInput.value =
                         homework.subject;
+
                     contentInput.value =
                         homework.content;
+
                     deadlineInput.value =
                         homework.deadline;
+
                     homeworkForm.style.display =
                         "block";
+
                     submitButton.textContent =
                         "保存修改";
-                    submitButton.dataset.editIndex =
-                        index;
+
+                    submitButton.dataset.editId =
+                        id;
                 }
             );
         }
@@ -298,21 +348,40 @@ function renderHomework() {
         document.querySelectorAll(
             ".delete-button"
         );
+
     deleteButtons.forEach(
         function(button) {
             button.addEventListener(
                 "click",
-                function() {
-                    const index =
+                async function() {
+                    const id =
                         Number(
-                            button.dataset.index
+                            button.dataset.id
                         );
-                    homeworkData.splice(
-                        index,
-                        1
-                    );
-                    saveHomework();
-                    renderHomework();
+
+                    const { error } =
+                        await supabaseClient
+                            .from("homework")
+                            .delete()
+                            .eq(
+                                "id",
+                                id
+                            );
+
+                    if (error) {
+                        console.error(
+                            "删除作业失败：",
+                            error
+                        );
+
+                        alert(
+                            "删除失败，请查看控制台。"
+                        );
+
+                        return;
+                    }
+
+                    await loadHomework();
                 }
             );
         }
@@ -348,27 +417,41 @@ submitButton.addEventListener(
         }
 
         // 判断是否为编辑
-        const editIndex =
-            submitButton.dataset.editIndex;
 
         // 编辑
+        const editId =
+            submitButton.dataset.editId;
+
         if (
-            editIndex !== undefined
+            editId !== undefined
         ) {
-            // 这里暂时还是原来的代码
-            homeworkData[
-                Number(editIndex)
-            ].subject = subject;
+            const { error } =
+                await supabaseClient
+                    .from("homework")
+                    .update({
+                        subject: subject,
+                        content: content,
+                        deadline: deadline
+                    })
+                    .eq(
+                        "id",
+                        Number(editId)
+                    );
 
-            homeworkData[
-                Number(editIndex)
-            ].content = content;
+            if (error) {
+                console.error(
+                    "修改作业失败：",
+                    error
+                );
 
-            homeworkData[
-                Number(editIndex)
-            ].deadline = deadline;
+                alert(
+                    "修改失败，请查看控制台。"
+                );
 
-            delete submitButton.dataset.editIndex;
+                return;
+            }
+
+            delete submitButton.dataset.editId;
 
             submitButton.textContent =
                 "添加";
@@ -380,11 +463,60 @@ submitButton.addEventListener(
                 fileInput.files[0];
 
             let fileName = "";
+            let fileURL = "";
 
+            // 如果选择了文件
             if (file) {
                 fileName = file.name;
+
+                // 给文件生成一个不会轻易重复的路径
+                const fileExtension =
+                    file.name.includes(".")
+                        ? file.name.substring(
+                            file.name.lastIndexOf(".")
+                        )
+                        : "";
+
+                const filePath =
+                    Date.now() + fileExtension;
+
+                // 上传到 Supabase Storage
+                const { error: uploadError } =
+                    await supabaseClient
+                        .storage
+                        .from("homework-files")
+                        .upload(
+                            filePath,
+                            file
+                        );
+
+                if (uploadError) {
+                    console.error(
+                        "文件上传失败：",
+                        uploadError
+                    );
+
+                    alert(
+                        "文件上传失败，请查看控制台。"
+                    );
+
+                    return;
+                }
+
+                // 获取公开访问地址
+                const { data: urlData } =
+                    supabaseClient
+                        .storage
+                        .from("homework-files")
+                        .getPublicUrl(
+                            filePath
+                        );
+
+                fileURL =
+                    urlData.publicUrl;
             }
 
+            // 把作业信息保存到数据库
             const { data, error } =
                 await supabaseClient
                     .from("homework")
@@ -394,6 +526,7 @@ submitButton.addEventListener(
                             content: content,
                             deadline: deadline,
                             file_name: fileName,
+                            file_url: fileURL,
                             completed: false
                         }
                     ])
@@ -428,46 +561,3 @@ submitButton.addEventListener(
         fileInput.value = "";
     }
 );
-// ==============================
-// 8. 搜索
-// ==============================
-searchInput.addEventListener(
-    "input",
-    function() {
-        searchText =
-            searchInput.value.trim();
-        renderHomework();
-    }
-);
-// ==============================
-// 9. 筛选按钮
-// ==============================
-filterButtons.forEach(
-    function(button) {
-        button.addEventListener(
-            "click",
-            function() {
-                // 当前筛选方式
-                currentFilter =
-                    button.dataset.filter;
-                // 去掉所有按钮的 active
-                filterButtons.forEach(
-                    function(otherButton) {
-                        otherButton.classList.remove(
-                            "active"
-                        );
-                    }
-                );
-                // 给当前按钮增加 active
-                button.classList.add(
-                    "active"
-                );
-                // 重新显示
-                renderHomework();
-            }
-        );
-    }
-);
-// ==============================
-// 10. 第一次打开页面
-// ==============================
